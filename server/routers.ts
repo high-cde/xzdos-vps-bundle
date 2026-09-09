@@ -4,11 +4,11 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { listEcosystemComponents, listEvidenceRecords } from "./db";
+import { fetchNodeStatus, getZcommCatalog, getZcommPage, validateZlang, zlangValidationInput } from "./microcosm";
 
-const zlangProgram = z.string().max(4000, "Programma troppo lungo");
 const safeRelativePath = z.string().regex(/^(?!\/)(?!.*\.\.)[A-Za-z0-9_./-]{1,180}$/, "Il percorso deve essere relativo al namespace autorizzato");
 
-function validateZlang(source: string) {
+function validateLegacyZlang(source: string) {
   const lines = source.split(/\r?\n/);
   const output: string[] = [];
   const errors: string[] = [];
@@ -48,8 +48,15 @@ export const appRouter = router({
   }),
   ecosystem: router({ list: publicProcedure.query(() => listEcosystemComponents()) }),
   evidence: router({ list: publicProcedure.query(() => listEvidenceRecords()) }),
+  node: router({
+    status: publicProcedure.query(() => fetchNodeStatus()),
+  }),
+  zcomm: router({
+    catalog: publicProcedure.query(() => getZcommCatalog()),
+    page: publicProcedure.input(z.object({ code: z.string().regex(/^\*\d{2}#$/) })).query(({ input }) => getZcommPage(input.code)),
+  }),
   zlang: router({
-    validate: publicProcedure.input(z.object({ source: zlangProgram })).mutation(({ input }) => validateZlang(input.source)),
+    validate: publicProcedure.input(zlangValidationInput).query(({ input }) => input.profile ? validateZlang(input.source, input.profile) : validateLegacyZlang(input.source)),
   }),
 });
 
