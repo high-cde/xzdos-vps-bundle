@@ -1,0 +1,7 @@
+// ZDOS Mesh Routing Protocol - Node: xzdos-vps-bundle
+network_mesh {
+    node_id: "xzdos-vps-bundle";
+    status: "ACTIVE_SOVEREIGN";
+    routing_protocol: "Z-ROUTER-V4";
+    encryption: "ED25519-STRICT";
+}
