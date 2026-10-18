@@ -1,0 +1,5 @@
+// xzdos-vps-bundle - ZDOS Secure Enclave
+module xzdos-vps-bundle {
+    enforce_zero_mock();
+    sync_dsn_ledger();
+}
